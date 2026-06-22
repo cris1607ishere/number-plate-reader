@@ -1,0 +1,21 @@
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# ── ONNX inference (no PyTorch needed) ────────────────────────────────────────
+onnxruntime==1.18.0
+
+# ── Image processing ───────────────────────────────────────────────────────────
+opencv-python-headless==4.9.0.80
+numpy==1.26.4
+
+# ── OCR (OCR.Space API — no binary install needed) ────────────────────────────
+requests==2.31.0
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+pydantic==2.7.1
+
+# ── Dev / training only (NOT needed on deployed server) ───────────────────────
+# ultralytics==8.2.0   # only required to export .pt → .onnx with download_model.py

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Gate Entry</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #f5f5f0;
+    --surface:    #ffffff;
+    --border:     #e0ddd6;
+    --text:       #1a1a18;
+    --muted:      #6b6b67;
+    --hint:       #9b9b97;
+    --accent:     #1a1a18;
+    --success:    #1a6b3a;
+    --success-bg: #e8f5ee;
+    --info:       #1450a3;
+    --info-bg:    #e8f0fb;
+    --warn:       #8a4b00;
+    --warn-bg:    #fdf0dc;
+    --danger:     #9b1c1c;
+    --danger-bg:  #fdeaea;
+    --radius:     12px;
+    --radius-sm:  8px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding-bottom: 32px;
+  }
+
+  .header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 20px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 10;
+  }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .nav-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 6px 14px;
+    font-size: 13px; color: var(--text); cursor: pointer;
+  }
+  .nav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .page { display: none; padding: 16px; max-width: 480px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;
+  }
+
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px 20px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    margin-bottom: 12px; position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: #f9f9f7; }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon  { font-size: 36px; margin-bottom: 8px; }
+  .upload-label { font-size: 15px; font-weight: 500; }
+  .upload-hint  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .btn-camera {
+    width: 100%; padding: 13px; border-radius: var(--radius);
+    background: var(--accent); color: #fff; border: none;
+    font-size: 15px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  #img-preview {
+    width: 100%; border-radius: var(--radius-sm); display: none;
+    margin-bottom: 12px; max-height: 200px; object-fit: cover;
+  }
+
+  /* ── Pipeline ── */
+  .pipeline { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+  .pipeline.show { display: block; }
+  .pipeline-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+  .pipeline-step { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 5px 0; color: var(--hint); transition: color .2s; }
+  .pipeline-step.done   { color: var(--success); }
+  .pipeline-step.active { color: var(--text); font-weight: 500; }
+  .pipeline-step.failed { color: var(--danger); }
+  .step-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* ── Inline plate with dropdowns ── */
+  .plate-row {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 2px; margin-bottom: 10px; min-height: 52px;
+  }
+
+  /* Certain character */
+  .plate-char {
+    font-size: 28px; font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--text); line-height: 1;
+  }
+
+  /* Uncertain character — dropdown */
+  .plate-select-wrap { position: relative; display: inline-flex; align-items: center; }
+  .plate-select {
+    font-size: 26px; font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--warn);
+    background: var(--warn-bg);
+    border: 2px solid #e8a020;
+    border-radius: 6px;
+    padding: 1px 22px 1px 5px;
+    appearance: none; -webkit-appearance: none;
+    cursor: pointer; outline: none;
+    min-width: 38px; text-align: center;
+    transition: border-color .15s;
+  }
+  .plate-select:focus { border-color: var(--accent); background: #fff9ee; }
+  .plate-select-wrap::after {
+    content: '▾'; position: absolute; right: 5px;
+    font-size: 11px; color: var(--warn); pointer-events: none;
+  }
+
+  /* Hint below plate */
+  .plate-hint { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .plate-hint.warn { color: var(--warn); font-weight: 500; }
+  .plate-hint.ok   { color: var(--success); }
+
+  /* Confidence bar */
+  .conf-bar-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .conf-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .conf-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+  .conf-label { font-size: 12px; color: var(--muted); min-width: 36px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-known    { background: var(--success-bg); color: var(--success); }
+  .badge-unknown  { background: var(--warn-bg);    color: var(--warn); }
+  .badge-autofill { background: var(--info-bg);    color: var(--info); font-size: 10px; padding: 2px 7px; }
+
+  /* ── Form ── */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 5px; }
+  .field input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 15px; background: var(--surface);
+    color: var(--text); outline: none; transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field input.autofilled { background: var(--info-bg); border-color: #b5cef4; color: var(--info); }
+
+  .toggle-row { display: flex; gap: 8px; }
+  .toggle-btn {
+    flex: 1; padding: 10px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface);
+    font-size: 14px; color: var(--muted); cursor: pointer;
+    text-align: center; font-weight: 500; transition: all .15s;
+  }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .btn-save {
+    width: 100%; padding: 14px; border-radius: var(--radius);
+    background: var(--accent); color: #fff; border: none;
+    font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 4px;
+    transition: opacity .15s;
+  }
+  .btn-save:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-manual {
+    width: 100%; padding: 12px; border-radius: var(--radius);
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px;
+  }
+  .btn-manual:hover { border-color: var(--accent); }
+
+  .banner {
+    border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px;
+    margin-bottom: 12px; display: none; align-items: center; gap: 8px;
+  }
+  .banner.show    { display: flex; }
+  .banner-success { background: var(--success-bg); color: var(--success); }
+  .banner-danger  { background: var(--danger-bg);  color: var(--danger); }
+  .banner-info    { background: var(--info-bg);     color: var(--info); }
+
+  /* ── Logs ── */
+  .search-wrap { position: relative; margin-bottom: 12px; }
+  .search-wrap input {
+    width: 100%; padding: 10px 12px 10px 36px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 14px; background: var(--surface); outline: none;
+  }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--hint); font-size: 16px; pointer-events: none; }
+  .log-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; }
+  .log-plate { font-size: 17px; font-weight: 700; letter-spacing: .07em; font-family: 'Courier New', monospace; }
+  .log-meta  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .log-row   { display: flex; justify-content: space-between; align-items: flex-start; }
+  .log-status { font-size: 11px; padding: 2px 9px; border-radius: 20px; font-weight: 500; }
+  .status-loaded { background: var(--success-bg); color: var(--success); }
+  .status-empty  { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--hint); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">🛡 Gate Entry</div>
+    <div class="header-sub">Vehicle logging system</div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="nav-btn active" id="nav-entry" onclick="showPage('entry')">Entry</button>
+    <button class="nav-btn"        id="nav-logs"  onclick="showPage('logs')">Logs</button>
+  </div>
+</div>
+
+<!-- ══ ENTRY PAGE ══════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-entry">
+
+  <button class="btn-camera" onclick="document.getElementById('camera-input').click()">
+    📷 Take Photo
+  </button>
+  <input type="file" id="camera-input" accept="image/*" capture="environment"
+         style="display:none" onchange="handleFile(this)">
+
+  <div class="upload-zone" id="drop-zone">
+    <input type="file" accept="image/*" onchange="handleFile(this)" id="file-input">
+    <div class="upload-icon">📁</div>
+    <div class="upload-label">Or upload from gallery</div>
+    <div class="upload-hint">JPG / PNG</div>
+  </div>
+
+  <img id="img-preview" alt="Vehicle photo preview">
+
+  <div class="pipeline" id="pipeline-box">
+    <div class="pipeline-title">Processing</div>
+    <div class="pipeline-step" id="step-upload">  <span class="step-icon">📤</span> Uploading image</div>
+    <div class="pipeline-step" id="step-yolo">    <span class="step-icon">🔍</span> Detecting plate</div>
+    <div class="pipeline-step" id="step-ocr">     <span class="step-icon">🔤</span> Reading characters</div>
+    <div class="pipeline-step" id="step-validate"><span class="step-icon">✅</span> Analysing confidence</div>
+  </div>
+
+  <div class="banner banner-danger" id="banner-error"></div>
+  <div class="banner banner-info"   id="banner-info"></div>
+
+  <button class="btn-manual" id="btn-manual" style="display:none" onclick="showManualForm()">
+    ✏️ Enter Plate Manually
+  </button>
+
+  <div id="entry-form" style="display:none">
+
+    <!-- Inline character confirmation card -->
+    <div class="card">
+      <div class="card-title">Confirm plate</div>
+
+      <!-- Plate with inline dropdowns for uncertain chars -->
+      <div class="plate-row" id="plate-row"></div>
+      <div class="plate-hint" id="plate-hint"></div>
+
+      <div class="conf-bar-wrap">
+        <div class="conf-bar"><div class="conf-bar-fill" id="conf-fill" style="width:0%"></div></div>
+        <div class="conf-label" id="conf-label">—</div>
+      </div>
+      <div id="known-badge"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Fill details</div>
+
+      <div class="field">
+        <label>Plate number <span style="color:var(--hint);font-weight:400">(edit if wrong)</span></label>
+        <input type="text" id="f-plate" placeholder="e.g. MP34AB1234"
+               oninput="this.value=this.value.toUpperCase()">
+      </div>
+
+      <div class="field">
+        <label>Driver name</label>
+        <input type="text" id="f-driver" placeholder="Enter driver name">
+      </div>
+
+      <div class="field">
+        <label>Owner company <span id="autofill-badge"></span></label>
+        <input type="text" id="f-company" placeholder="Enter company name">
+      </div>
+
+      <div class="field">
+        <label>Load status</label>
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="btn-loaded" onclick="setLoad('Loaded')">Loaded</button>
+          <button class="toggle-btn"        id="btn-empty"  onclick="setLoad('Empty')">Empty</button>
+        </div>
+      </div>
+
+      <div class="banner banner-success" id="banner-saved">✅ Entry saved successfully!</div>
+      <button class="btn-save" id="btn-save" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGS PAGE ═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-logs">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="Search plate or driver…"
+           oninput="searchLogs(this.value)">
+  </div>
+  <button class="btn-manual" id="btn-clear-logs" onclick="clearLogs()"
+        style="margin-bottom:12px;color:var(--danger);border-color:var(--danger-bg);">
+  🗑 Clear All Logs
+</button>
+  <div id="logs-container"><div class="empty-state">Loading logs…</div></div>
+</div>
+
+<script>
+let state = { load: 'Loaded' };
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if (name === 'logs') loadLogs();
+}
+
+// ── Image compression ──────────────────────────────────────────────────────────
+function compressImage(file, maxSizeKB = 900, maxDim = 1600) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width  = Math.round(width  * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      let lo = 0.3, hi = 0.92;
+      const attempt = q => new Promise(res => canvas.toBlob(b => res(b), 'image/jpeg', q));
+      (async () => {
+        let blob;
+        for (let i = 0; i < 6; i++) {
+          const mid = (lo + hi) / 2;
+          blob = await attempt(mid);
+          if (blob.size / 1024 > maxSizeKB) hi = mid; else lo = mid;
+        }
+        blob = await attempt(lo);
+        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+      })();
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// ── Pipeline ───────────────────────────────────────────────────────────────────
+const STEPS = ['upload','yolo','ocr','validate'];
+function pipelineStart() {
+  document.getElementById('pipeline-box').classList.add('show');
+  STEPS.forEach(s => document.getElementById('step-'+s).className = 'pipeline-step');
+}
+function pipelineStep(name) {
+  const idx = STEPS.indexOf(name);
+  if (idx > 0) document.getElementById('step-'+STEPS[idx-1]).classList.replace('active','done') || document.getElementById('step-'+STEPS[idx-1]).classList.add('done');
+  document.getElementById('step-'+name).classList.add('active');
+}
+function pipelineDone() {
+  STEPS.forEach(s => { const el = document.getElementById('step-'+s); el.classList.remove('active'); el.classList.add('done'); });
+  setTimeout(() => document.getElementById('pipeline-box').classList.remove('show'), 800);
+}
+function pipelineFail(s) {
+  if (s) { document.getElementById('step-'+s).classList.remove('active'); document.getElementById('step-'+s).classList.add('failed'); }
+  setTimeout(() => document.getElementById('pipeline-box').classList.remove('show'), 1200);
+}
+
+// ── File handling ──────────────────────────────────────────────────────────────
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('img-preview');
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  runPipeline(file);
+}
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) { document.getElementById('file-input').files = e.dataTransfer.files; runPipeline(file); }
+});
+
+// ── Main pipeline ──────────────────────────────────────────────────────────────
+async function runPipeline(file) {
+  hideBanner('error'); hideBanner('info');
+  document.getElementById('entry-form').style.display = 'none';
+  document.getElementById('btn-manual').style.display = 'none';
+  document.getElementById('banner-saved').classList.remove('show');
+
+  pipelineStart();
+  pipelineStep('upload');
+  const compressed = await compressImage(file);
+  pipelineStep('yolo');
+
+  const fd = new FormData();
+  fd.append('file', compressed);
+
+  let data;
+  try {
+    const res = await fetch('/ocr', { method:'POST', body:fd });
+    data = await res.json();
+    if (!res.ok) {
+      pipelineFail('yolo');
+      showBanner('error', '⚠️ ' + (data.detail || 'Detection failed'));
+      document.getElementById('btn-manual').style.display = 'block';
+      return;
+    }
+  } catch(e) {
+    pipelineFail('yolo');
+    showBanner('error', '⚠️ Network error. Is the server running?');
+    return;
+  }
+
+  if (!data.plate) {
+    pipelineFail('yolo');
+    showBanner('error', '⚠️ No number plate detected. Try a clearer, closer shot.');
+    document.getElementById('btn-manual').style.display = 'block';
+    return;
+  }
+
+  pipelineStep('ocr');
+  await sleep(100);
+  pipelineStep('validate');
+  await sleep(100);
+  pipelineDone();
+
+  renderPlate(data);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Render inline plate with per-character dropdowns ──────────────────────────
+function renderPlate(data) {
+  const row = document.getElementById('plate-row');
+  row.innerHTML = '';
+
+  const nUncertain = data.characters.filter(c => c.uncertain).length;
+
+  data.characters.forEach((c, i) => {
+    if (!c.uncertain) {
+      // Certain — plain character
+      const span = document.createElement('span');
+      span.className   = 'plate-char';
+      span.textContent = c.char;
+      row.appendChild(span);
+    } else {
+      // Uncertain — dropdown
+      const wrap = document.createElement('div');
+      wrap.className = 'plate-select-wrap';
+
+      const sel = document.createElement('select');
+      sel.className  = 'plate-select';
+      sel.dataset.pos = i;
+
+      c.options.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        if (opt === c.char) o.selected = true;
+        sel.appendChild(o);
+      });
+
+      sel.addEventListener('change', syncPlateField);
+      wrap.appendChild(sel);
+      row.appendChild(wrap);
+    }
+  });
+
+  // Hint
+  const hint = document.getElementById('plate-hint');
+  if (nUncertain === 0) {
+    hint.textContent = '✓ All characters confirmed by OCR';
+    hint.className   = 'plate-hint ok';
+  } else {
+    hint.textContent = `${nUncertain} uncertain character${nUncertain > 1 ? 's' : ''} — tap orange to correct`;
+    hint.className   = 'plate-hint warn';
+  }
+
+  // Confidence bar
+  const pct  = Math.round(data.confidence * 100);
+  const fill = document.getElementById('conf-fill');
+  fill.style.width      = pct + '%';
+  fill.style.background = pct >= 75 ? '#1a6b3a' : pct >= 50 ? '#8a4b00' : '#9b1c1c';
+  document.getElementById('conf-label').textContent = pct + '%';
+
+  // Known vehicle
+  const kv            = data.known_vehicle;
+  const companyInput  = document.getElementById('f-company');
+  const badge         = document.getElementById('known-badge');
+  const autofillBadge = document.getElementById('autofill-badge');
+  if (kv) {
+    badge.innerHTML         = '<span class="badge badge-known">✓ Known vehicle</span>';
+    companyInput.value      = kv.company_name || '';
+    companyInput.classList.add('autofilled');
+    autofillBadge.innerHTML = '<span class="badge badge-autofill">auto-filled</span>';
+  } else {
+    badge.innerHTML         = '<span class="badge badge-unknown">⚠ New vehicle</span>';
+    companyInput.value      = '';
+    companyInput.classList.remove('autofilled');
+    autofillBadge.innerHTML = '';
+  }
+
+  syncPlateField();
+  document.getElementById('entry-form').style.display = 'block';
+}
+
+// ── Sync plate text field from inline dropdowns ────────────────────────────────
+function syncPlateField() {
+  const row   = document.getElementById('plate-row');
+  let   plate = '';
+  Array.from(row.children).forEach(el => {
+    if (el.classList.contains('plate-char')) {
+      plate += el.textContent;
+    } else if (el.classList.contains('plate-select-wrap')) {
+      plate += el.querySelector('select').value;
+    }
+  });
+  document.getElementById('f-plate').value = plate;
+}
+
+// ── Manual entry ───────────────────────────────────────────────────────────────
+function showManualForm() {
+  document.getElementById('btn-manual').style.display = 'none';
+  document.getElementById('plate-row').innerHTML      = '';
+  document.getElementById('plate-hint').textContent   = '';
+  document.getElementById('known-badge').innerHTML    = '';
+  document.getElementById('conf-fill').style.width    = '0%';
+  document.getElementById('conf-label').textContent   = '—';
+  document.getElementById('f-plate').value            = '';
+  hideBanner('error');
+  document.getElementById('entry-form').style.display = 'block';
+  document.getElementById('f-plate').focus();
+}
+
+// ── Load toggle ────────────────────────────────────────────────────────────────
+function setLoad(val) {
+  state.load = val;
+  document.getElementById('btn-loaded').classList.toggle('active', val==='Loaded');
+  document.getElementById('btn-empty').classList.toggle('active',  val==='Empty');
+}
+
+// ── Save entry ─────────────────────────────────────────────────────────────────
+async function saveEntry() {
+  const plate   = document.getElementById('f-plate').value.trim().toUpperCase();
+  const driver  = document.getElementById('f-driver').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  if (!plate)   { document.getElementById('f-plate').focus();   return; }
+  if (!driver)  { document.getElementById('f-driver').focus();  return; }
+  if (!company) { document.getElementById('f-company').focus(); return; }
+  document.getElementById('btn-save').disabled = true;
+  try {
+    const res  = await fetch('/save', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ plate_number:plate, driver_name:driver, company_name:company, load_status:state.load }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('banner-saved').classList.add('show');
+      resetForm();
+    } else {
+      showBanner('error', '⚠️ Save failed. Try again.');
+    }
+  } catch(e) { showBanner('error', '⚠️ Network error saving entry.'); }
+  document.getElementById('btn-save').disabled = false;
+}
+
+function resetForm() {
+  setTimeout(() => {
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('entry-form').style.display  = 'none';
+    document.getElementById('banner-saved').classList.remove('show');
+    document.getElementById('plate-row').innerHTML = '';
+    document.getElementById('f-driver').value  = '';
+    document.getElementById('f-company').value = '';
+    document.getElementById('camera-input').value = '';
+    document.getElementById('file-input').value   = '';
+    document.getElementById('btn-manual').style.display = 'none';
+    setLoad('Loaded');
+  }, 2000);
+}
+
+// ── Logs ───────────────────────────────────────────────────────────────────────
+let logTimer;
+function searchLogs(q) { clearTimeout(logTimer); logTimer = setTimeout(() => loadLogs(q), 300); }
+
+async function loadLogs(search='') {
+  const container = document.getElementById('logs-container');
+  try {
+    const res  = await fetch('/logs' + (search ? `?search=${encodeURIComponent(search)}` : ''));
+    const logs = await res.json();
+    if (!logs.length) { container.innerHTML = '<div class="empty-state">No entries found.</div>'; return; }
+    container.innerHTML = logs.map(log => `
+      <div class="log-item">
+        <div class="log-row">
+          <div class="log-plate">${log.plate_number}</div>
+          <span class="log-status ${log.load_status==='Loaded'?'status-loaded':'status-empty'}">${log.load_status||'—'}</span>
+        </div>
+        <div class="log-meta">${log.driver_name||'Unknown driver'} · ${log.company_name||'—'}</div>
+        <div class="log-meta">${formatTime(log.timestamp)}</div>
+      </div>`).join('');
+  } catch(e) { container.innerHTML = '<div class="empty-state">Could not load logs.</div>'; }
+}
+
+async function clearLogs() {
+  if (!confirm("Delete all log entries? This cannot be undone.")) return;
+  try {
+    const res = await fetch('/logs', { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) loadLogs();
+  } catch(e) {
+    alert('Failed to clear logs.');
+  }
+}
+
+function formatTime(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+}
+
+function showBanner(type, msg) { const el = document.getElementById('banner-'+type); el.textContent = msg; el.classList.add('show'); }
+function hideBanner(type) { document.getElementById('banner-'+type).classList.remove('show'); }
+</script>
+</body>
+</html>
