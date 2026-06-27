@@ -59,29 +59,53 @@
     text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;
   }
 
+  /* ── Section headers ── */
+  .section-label {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .05em;
+    margin: 16px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── Upload zones ── */
+  .upload-row {
+    display: flex; gap: 8px; margin-bottom: 12px;
+  }
   .upload-zone {
-    border: 2px dashed var(--border); border-radius: var(--radius);
-    padding: 32px 20px; text-align: center; cursor: pointer;
-    transition: border-color .2s, background .2s;
-    margin-bottom: 12px; position: relative;
+    flex: 1; border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 20px 10px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s; position: relative;
   }
   .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: #f9f9f7; }
+  .upload-zone.done { border-color: var(--success); border-style: solid; background: var(--success-bg); }
+  .upload-zone.failed { border-color: var(--danger); border-style: solid; background: var(--danger-bg); }
   .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon  { font-size: 36px; margin-bottom: 8px; }
-  .upload-label { font-size: 15px; font-weight: 500; }
-  .upload-hint  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .upload-icon  { font-size: 26px; margin-bottom: 6px; }
+  .upload-label { font-size: 13px; font-weight: 500; }
+  .upload-hint  { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
+  .btn-camera-row { display: flex; gap: 8px; margin-bottom: 12px; }
   .btn-camera {
-    width: 100%; padding: 13px; border-radius: var(--radius);
+    flex: 1; padding: 11px; border-radius: var(--radius);
     background: var(--accent); color: #fff; border: none;
-    font-size: 15px; font-weight: 500; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 12px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
   }
 
-  #img-preview {
-    width: 100%; border-radius: var(--radius-sm); display: none;
-    margin-bottom: 12px; max-height: 200px; object-fit: cover;
+  .preview-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .preview-wrap { flex: 1; position: relative; }
+  .preview-wrap img {
+    width: 100%; height: 100px; object-fit: cover;
+    border-radius: var(--radius-sm); display: none;
+    border: 1px solid var(--border);
+  }
+  .preview-wrap img.show { display: block; }
+  .preview-label {
+    font-size: 10px; color: var(--muted); text-align: center;
+    margin-top: 3px; text-transform: uppercase; letter-spacing: .04em;
   }
 
   /* ── Pipeline ── */
@@ -99,27 +123,20 @@
     display: flex; flex-wrap: wrap; align-items: center;
     gap: 2px; margin-bottom: 10px; min-height: 52px;
   }
-
-  /* Certain character */
   .plate-char {
     font-size: 28px; font-weight: 700;
     font-family: 'Courier New', monospace;
     color: var(--text); line-height: 1;
   }
-
-  /* Uncertain character — dropdown */
   .plate-select-wrap { position: relative; display: inline-flex; align-items: center; }
   .plate-select {
     font-size: 26px; font-weight: 700;
     font-family: 'Courier New', monospace;
-    color: var(--warn);
-    background: var(--warn-bg);
-    border: 2px solid #e8a020;
-    border-radius: 6px;
+    color: var(--warn); background: var(--warn-bg);
+    border: 2px solid #e8a020; border-radius: 6px;
     padding: 1px 22px 1px 5px;
     appearance: none; -webkit-appearance: none;
-    cursor: pointer; outline: none;
-    min-width: 38px; text-align: center;
+    cursor: pointer; outline: none; min-width: 38px; text-align: center;
     transition: border-color .15s;
   }
   .plate-select:focus { border-color: var(--accent); background: #fff9ee; }
@@ -127,13 +144,10 @@
     content: '▾'; position: absolute; right: 5px;
     font-size: 11px; color: var(--warn); pointer-events: none;
   }
-
-  /* Hint below plate */
   .plate-hint { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   .plate-hint.warn { color: var(--warn); font-weight: 500; }
   .plate-hint.ok   { color: var(--success); }
 
-  /* Confidence bar */
   .conf-bar-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .conf-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .conf-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
@@ -146,6 +160,19 @@
   .badge-known    { background: var(--success-bg); color: var(--success); }
   .badge-unknown  { background: var(--warn-bg);    color: var(--warn); }
   .badge-autofill { background: var(--info-bg);    color: var(--info); font-size: 10px; padding: 2px 7px; }
+
+  /* ── Odometer card ── */
+  .odo-result {
+    display: none; background: var(--info-bg); border: 1px solid #b5cef4;
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .odo-result.show { display: block; }
+  .odo-reading {
+    font-size: 32px; font-weight: 700; font-family: 'Courier New', monospace;
+    color: var(--info); margin-bottom: 4px;
+  }
+  .odo-reading span { font-size: 14px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+  .odo-conf { font-size: 12px; color: var(--muted); }
 
   /* ── Form ── */
   .field { margin-bottom: 14px; }
@@ -201,6 +228,7 @@
   .log-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; }
   .log-plate { font-size: 17px; font-weight: 700; letter-spacing: .07em; font-family: 'Courier New', monospace; }
   .log-meta  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .log-odo   { font-size: 12px; color: var(--info);  margin-top: 2px; }
   .log-row   { display: flex; justify-content: space-between; align-items: flex-start; }
   .log-status { font-size: 11px; padding: 2px 9px; border-radius: 20px; font-weight: 500; }
   .status-loaded { background: var(--success-bg); color: var(--success); }
@@ -224,56 +252,102 @@
 <!-- ══ ENTRY PAGE ══════════════════════════════════════════════════════════════ -->
 <div class="page active" id="page-entry">
 
-  <button class="btn-camera" onclick="document.getElementById('camera-input').click()">
-    📷 Take Photo
-  </button>
-  <input type="file" id="camera-input" accept="image/*" capture="environment"
-         style="display:none" onchange="handleFile(this)">
+  <!-- ── Step 1: Plate photo ── -->
+  <div class="section-label">1 · Number Plate Photo</div>
 
-  <div class="upload-zone" id="drop-zone">
-    <input type="file" accept="image/*" onchange="handleFile(this)" id="file-input">
-    <div class="upload-icon">📁</div>
-    <div class="upload-label">Or upload from gallery</div>
+  <div class="btn-camera-row">
+    <button class="btn-camera" onclick="document.getElementById('camera-plate').click()">
+      📷 Camera
+    </button>
+    <input type="file" id="camera-plate" accept="image/*" capture="environment"
+           style="display:none" onchange="handlePlateFile(this)">
+  </div>
+
+  <div class="upload-zone" id="drop-plate">
+    <input type="file" accept="image/*" id="file-plate" onchange="handlePlateFile(this)">
+    <div class="upload-icon">🚗</div>
+    <div class="upload-label">Upload plate photo</div>
     <div class="upload-hint">JPG / PNG</div>
   </div>
 
-  <img id="img-preview" alt="Vehicle photo preview">
-
-  <div class="pipeline" id="pipeline-box">
-    <div class="pipeline-title">Processing</div>
-    <div class="pipeline-step" id="step-upload">  <span class="step-icon">📤</span> Uploading image</div>
-    <div class="pipeline-step" id="step-yolo">    <span class="step-icon">🔍</span> Detecting plate</div>
-    <div class="pipeline-step" id="step-ocr">     <span class="step-icon">🔤</span> Reading characters</div>
-    <div class="pipeline-step" id="step-validate"><span class="step-icon">✅</span> Analysing confidence</div>
+  <div class="preview-wrap" style="margin-bottom:12px">
+    <img id="preview-plate" alt="Plate preview">
+    <div class="preview-label">Plate photo</div>
   </div>
 
-  <div class="banner banner-danger" id="banner-error"></div>
-  <div class="banner banner-info"   id="banner-info"></div>
+  <!-- Plate pipeline -->
+  <div class="pipeline" id="pipeline-p">
+    <div class="pipeline-title">Reading plate</div>
+    <div class="pipeline-step" id="pstep-upload"> <span class="step-icon">📤</span> Uploading</div>
+    <div class="pipeline-step" id="pstep-yolo">   <span class="step-icon">🔍</span> Detecting plate</div>
+    <div class="pipeline-step" id="pstep-ocr">    <span class="step-icon">🔤</span> Reading characters</div>
+    <div class="pipeline-step" id="pstep-done">   <span class="step-icon">✅</span> Analysing confidence</div>
+  </div>
+
+  <div class="banner banner-danger" id="banner-plate-error"></div>
 
   <button class="btn-manual" id="btn-manual" style="display:none" onclick="showManualForm()">
     ✏️ Enter Plate Manually
   </button>
 
-  <div id="entry-form" style="display:none">
-
-    <!-- Inline character confirmation card -->
-    <div class="card">
-      <div class="card-title">Confirm plate</div>
-
-      <!-- Plate with inline dropdowns for uncertain chars -->
-      <div class="plate-row" id="plate-row"></div>
-      <div class="plate-hint" id="plate-hint"></div>
-
-      <div class="conf-bar-wrap">
-        <div class="conf-bar"><div class="conf-bar-fill" id="conf-fill" style="width:0%"></div></div>
-        <div class="conf-label" id="conf-label">—</div>
-      </div>
-      <div id="known-badge"></div>
+  <!-- Plate result card -->
+  <div class="card" id="plate-result-card" style="display:none">
+    <div class="card-title">Confirm plate</div>
+    <div class="plate-row" id="plate-row"></div>
+    <div class="plate-hint" id="plate-hint"></div>
+    <div class="conf-bar-wrap">
+      <div class="conf-bar"><div class="conf-bar-fill" id="conf-fill" style="width:0%"></div></div>
+      <div class="conf-label" id="conf-label">—</div>
     </div>
+    <div id="known-badge"></div>
+  </div>
+
+  <!-- ── Step 2: Odometer photo ── -->
+  <div class="section-label">2 · Dashboard / Odometer Photo</div>
+
+  <div class="btn-camera-row">
+    <button class="btn-camera" onclick="document.getElementById('camera-odo').click()">
+      📷 Camera
+    </button>
+    <input type="file" id="camera-odo" accept="image/*" capture="environment"
+           style="display:none" onchange="handleOdoFile(this)">
+  </div>
+
+  <div class="upload-zone" id="drop-odo">
+    <input type="file" accept="image/*" id="file-odo" onchange="handleOdoFile(this)">
+    <div class="upload-icon">🔢</div>
+    <div class="upload-label">Upload dashboard photo</div>
+    <div class="upload-hint">JPG / PNG</div>
+  </div>
+
+  <div class="preview-wrap" style="margin-bottom:12px">
+    <img id="preview-odo" alt="Dashboard preview">
+    <div class="preview-label">Dashboard photo</div>
+  </div>
+
+  <!-- Odometer pipeline -->
+  <div class="pipeline" id="pipeline-o">
+    <div class="pipeline-title">Reading odometer</div>
+    <div class="pipeline-step" id="ostep-upload"> <span class="step-icon">📤</span> Uploading</div>
+    <div class="pipeline-step" id="ostep-yolo">   <span class="step-icon">🔍</span> Detecting odometer</div>
+    <div class="pipeline-step" id="ostep-ocr">    <span class="step-icon">🔤</span> Reading digits</div>
+    <div class="pipeline-step" id="ostep-done">   <span class="step-icon">✅</span> Done</div>
+  </div>
+
+  <div class="banner banner-danger" id="banner-odo-error"></div>
+
+  <!-- Odometer result -->
+  <div class="odo-result" id="odo-result">
+    <div class="card-title" style="margin-bottom:8px">Odometer reading</div>
+    <div class="odo-reading" id="odo-reading">—<span>km</span></div>
+    <div class="odo-conf"   id="odo-conf"></div>
+  </div>
+
+  <!-- ── Step 3: Details form ── -->
+  <div id="entry-form" style="display:none">
+    <div class="section-label">3 · Fill Details</div>
 
     <div class="card">
-      <div class="card-title">Fill details</div>
-
       <div class="field">
         <label>Plate number <span style="color:var(--hint);font-weight:400">(edit if wrong)</span></label>
         <input type="text" id="f-plate" placeholder="e.g. MP34AB1234"
@@ -290,6 +364,11 @@
         <input type="text" id="f-company" placeholder="Enter company name">
       </div>
 
+      <div class="field" id="odo-field" style="display:none">
+        <label>Odometer (km) <span style="color:var(--hint);font-weight:400">(edit if wrong)</span></label>
+        <input type="text" id="f-odometer" placeholder="e.g. 123456" inputmode="numeric">
+      </div>
+
       <div class="field">
         <label>Load status</label>
         <div class="toggle-row">
@@ -302,6 +381,7 @@
       <button class="btn-save" id="btn-save" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
+
 </div>
 
 <!-- ══ LOGS PAGE ═══════════════════════════════════════════════════════════════ -->
@@ -311,10 +391,10 @@
     <input type="text" id="search-input" placeholder="Search plate or driver…"
            oninput="searchLogs(this.value)">
   </div>
-  <button class="btn-manual" id="btn-clear-logs" onclick="clearLogs()"
-        style="margin-bottom:12px;color:var(--danger);border-color:var(--danger-bg);">
-  🗑 Clear All Logs
-</button>
+  <button class="btn-manual" onclick="clearLogs()"
+          style="margin-bottom:12px;color:var(--danger);border-color:var(--danger-bg);">
+    🗑 Clear All Logs
+  </button>
   <div id="logs-container"><div class="empty-state">Loading logs…</div></div>
 </div>
 
@@ -361,192 +441,258 @@ function compressImage(file, maxSizeKB = 900, maxDim = 1600) {
   });
 }
 
-// ── Pipeline ───────────────────────────────────────────────────────────────────
-const STEPS = ['upload','yolo','ocr','validate'];
-function pipelineStart() {
-  document.getElementById('pipeline-box').classList.add('show');
-  STEPS.forEach(s => document.getElementById('step-'+s).className = 'pipeline-step');
+// ── Pipeline helpers ───────────────────────────────────────────────────────────
+function pipelineRun(prefix, steps) {
+  const box = document.getElementById('pipeline-'+prefix);
+  box.classList.add('show');
+  steps.forEach(s => {
+    const el = document.getElementById(prefix+'step-'+s);
+    el.className = 'pipeline-step';
+  });
 }
-function pipelineStep(name) {
-  const idx = STEPS.indexOf(name);
-  if (idx > 0) document.getElementById('step-'+STEPS[idx-1]).classList.replace('active','done') || document.getElementById('step-'+STEPS[idx-1]).classList.add('done');
-  document.getElementById('step-'+name).classList.add('active');
+function pipelineStep(prefix, name, steps) {
+  const idx = steps.indexOf(name);
+  if (idx > 0) {
+    const prev = document.getElementById(prefix+'step-'+steps[idx-1]);
+    prev.classList.remove('active'); prev.classList.add('done');
+  }
+  document.getElementById(prefix+'step-'+name).classList.add('active');
 }
-function pipelineDone() {
-  STEPS.forEach(s => { const el = document.getElementById('step-'+s); el.classList.remove('active'); el.classList.add('done'); });
-  setTimeout(() => document.getElementById('pipeline-box').classList.remove('show'), 800);
+function pipelineDone(prefix, steps) {
+  steps.forEach(s => {
+    const el = document.getElementById(prefix+'step-'+s);
+    el.classList.remove('active'); el.classList.add('done');
+  });
+  setTimeout(() => document.getElementById('pipeline-'+prefix).classList.remove('show'), 800);
 }
-function pipelineFail(s) {
-  if (s) { document.getElementById('step-'+s).classList.remove('active'); document.getElementById('step-'+s).classList.add('failed'); }
-  setTimeout(() => document.getElementById('pipeline-box').classList.remove('show'), 1200);
+function pipelineFail(prefix, name) {
+  if (name) {
+    const el = document.getElementById(prefix+'step-'+name);
+    el.classList.remove('active'); el.classList.add('failed');
+  }
+  setTimeout(() => document.getElementById('pipeline-'+prefix).classList.remove('show'), 1200);
 }
 
-// ── File handling ──────────────────────────────────────────────────────────────
-function handleFile(input) {
+const PLATE_STEPS = ['upload','yolo','ocr','done'];
+const ODO_STEPS   = ['upload','yolo','ocr','done'];
+
+// ── Drag & drop ────────────────────────────────────────────────────────────────
+function setupDrop(zoneId, handler) {
+  const z = document.getElementById(zoneId);
+  z.addEventListener('dragover',  e => { e.preventDefault(); z.classList.add('drag'); });
+  z.addEventListener('dragleave', () => z.classList.remove('drag'));
+  z.addEventListener('drop', e => {
+    e.preventDefault(); z.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) handler(f);
+  });
+}
+setupDrop('drop-plate', runPlatePipeline);
+setupDrop('drop-odo',   runOdoPipeline);
+
+// ── Plate file handler ─────────────────────────────────────────────────────────
+function handlePlateFile(input) {
   const file = input.files[0];
   if (!file) return;
-  const preview = document.getElementById('img-preview');
+  const preview = document.getElementById('preview-plate');
   preview.src = URL.createObjectURL(file);
-  preview.style.display = 'block';
-  runPipeline(file);
+  preview.classList.add('show');
+  runPlatePipeline(file);
 }
 
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if (file) { document.getElementById('file-input').files = e.dataTransfer.files; runPipeline(file); }
-});
+async function runPlatePipeline(file) {
+  hideBanner('plate-error');
+  document.getElementById('plate-result-card').style.display = 'none';
+  document.getElementById('entry-form').style.display        = 'none';
+  document.getElementById('btn-manual').style.display        = 'none';
 
-// ── Main pipeline ──────────────────────────────────────────────────────────────
-async function runPipeline(file) {
-  hideBanner('error'); hideBanner('info');
-  document.getElementById('entry-form').style.display = 'none';
-  document.getElementById('btn-manual').style.display = 'none';
-  document.getElementById('banner-saved').classList.remove('show');
-
-  pipelineStart();
-  pipelineStep('upload');
+  pipelineRun('p', PLATE_STEPS);
+  pipelineStep('p', 'upload', PLATE_STEPS);
   const compressed = await compressImage(file);
-  pipelineStep('yolo');
 
+  pipelineStep('p', 'yolo', PLATE_STEPS);
   const fd = new FormData();
   fd.append('file', compressed);
 
   let data;
   try {
-    const res = await fetch('/ocr', { method:'POST', body:fd });
+    const res = await fetch('/ocr', { method: 'POST', body: fd });
     data = await res.json();
     if (!res.ok) {
-      pipelineFail('yolo');
-      showBanner('error', '⚠️ ' + (data.detail || 'Detection failed'));
+      pipelineFail('p', 'yolo');
+      showBanner('plate-error', '⚠️ ' + (data.detail || 'Detection failed'));
       document.getElementById('btn-manual').style.display = 'block';
       return;
     }
   } catch(e) {
-    pipelineFail('yolo');
-    showBanner('error', '⚠️ Network error. Is the server running?');
+    pipelineFail('p', 'yolo');
+    showBanner('plate-error', '⚠️ Network error. Is the server running?');
     return;
   }
 
   if (!data.plate) {
-    pipelineFail('yolo');
-    showBanner('error', '⚠️ No number plate detected. Try a clearer, closer shot.');
+    pipelineFail('p', 'yolo');
+    showBanner('plate-error', '⚠️ No number plate detected. Try a clearer shot.');
     document.getElementById('btn-manual').style.display = 'block';
     return;
   }
 
-  pipelineStep('ocr');
-  await sleep(100);
-  pipelineStep('validate');
-  await sleep(100);
-  pipelineDone();
+  pipelineStep('p', 'ocr',  PLATE_STEPS);
+  await sleep(80);
+  pipelineStep('p', 'done', PLATE_STEPS);
+  await sleep(80);
+  pipelineDone('p', PLATE_STEPS);
 
   renderPlate(data);
+  document.getElementById('drop-plate').classList.add('done');
+}
+
+// ── Odometer file handler ──────────────────────────────────────────────────────
+function handleOdoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('preview-odo');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.add('show');
+  runOdoPipeline(file);
+}
+
+async function runOdoPipeline(file) {
+  hideBanner('odo-error');
+  document.getElementById('odo-result').classList.remove('show');
+  document.getElementById('odo-field').style.display = 'none';
+
+  pipelineRun('o', ODO_STEPS);
+  pipelineStep('o', 'upload', ODO_STEPS);
+  const compressed = await compressImage(file);
+
+  pipelineStep('o', 'yolo', ODO_STEPS);
+  const fd = new FormData();
+  fd.append('file', compressed);
+
+  let data;
+  try {
+    const res = await fetch('/ocr_odometer', { method: 'POST', body: fd });
+    data = await res.json();
+    if (!res.ok) {
+      pipelineFail('o', 'yolo');
+      showBanner('odo-error', '⚠️ ' + (data.detail || 'Odometer detection failed'));
+      return;
+    }
+  } catch(e) {
+    pipelineFail('o', 'yolo');
+    showBanner('odo-error', '⚠️ Network error.');
+    return;
+  }
+
+  if (!data.odometer) {
+    pipelineFail('o', 'yolo');
+    showBanner('odo-error', '⚠️ No odometer detected. Try a closer shot of the dashboard.');
+    return;
+  }
+
+  pipelineStep('o', 'ocr',  ODO_STEPS);
+  await sleep(80);
+  pipelineStep('o', 'done', ODO_STEPS);
+  await sleep(80);
+  pipelineDone('o', ODO_STEPS);
+
+  renderOdometer(data);
+  document.getElementById('drop-odo').classList.add('done');
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ── Render inline plate with per-character dropdowns ──────────────────────────
+// ── Render plate ───────────────────────────────────────────────────────────────
 function renderPlate(data) {
   const row = document.getElementById('plate-row');
   row.innerHTML = '';
-
   const nUncertain = data.characters.filter(c => c.uncertain).length;
 
   data.characters.forEach((c, i) => {
     if (!c.uncertain) {
-      // Certain — plain character
       const span = document.createElement('span');
-      span.className   = 'plate-char';
-      span.textContent = c.char;
+      span.className = 'plate-char'; span.textContent = c.char;
       row.appendChild(span);
     } else {
-      // Uncertain — dropdown
       const wrap = document.createElement('div');
       wrap.className = 'plate-select-wrap';
-
       const sel = document.createElement('select');
-      sel.className  = 'plate-select';
-      sel.dataset.pos = i;
-
+      sel.className = 'plate-select'; sel.dataset.pos = i;
       c.options.forEach(opt => {
         const o = document.createElement('option');
         o.value = opt; o.textContent = opt;
         if (opt === c.char) o.selected = true;
         sel.appendChild(o);
       });
-
       sel.addEventListener('change', syncPlateField);
-      wrap.appendChild(sel);
-      row.appendChild(wrap);
+      wrap.appendChild(sel); row.appendChild(wrap);
     }
   });
 
-  // Hint
   const hint = document.getElementById('plate-hint');
   if (nUncertain === 0) {
-    hint.textContent = '✓ All characters confirmed by OCR';
-    hint.className   = 'plate-hint ok';
+    hint.textContent = '✓ All characters confirmed'; hint.className = 'plate-hint ok';
   } else {
-    hint.textContent = `${nUncertain} uncertain character${nUncertain > 1 ? 's' : ''} — tap orange to correct`;
-    hint.className   = 'plate-hint warn';
+    hint.textContent = `${nUncertain} uncertain — tap orange to correct`;
+    hint.className = 'plate-hint warn';
   }
 
-  // Confidence bar
   const pct  = Math.round(data.confidence * 100);
   const fill = document.getElementById('conf-fill');
   fill.style.width      = pct + '%';
   fill.style.background = pct >= 75 ? '#1a6b3a' : pct >= 50 ? '#8a4b00' : '#9b1c1c';
   document.getElementById('conf-label').textContent = pct + '%';
 
-  // Known vehicle
-  const kv            = data.known_vehicle;
-  const companyInput  = document.getElementById('f-company');
-  const badge         = document.getElementById('known-badge');
-  const autofillBadge = document.getElementById('autofill-badge');
-  if (kv) {
-    badge.innerHTML         = '<span class="badge badge-known">✓ Known vehicle</span>';
-    companyInput.value      = kv.company_name || '';
-    companyInput.classList.add('autofilled');
-    autofillBadge.innerHTML = '<span class="badge badge-autofill">auto-filled</span>';
-  } else {
-    badge.innerHTML         = '<span class="badge badge-unknown">⚠ New vehicle</span>';
-    companyInput.value      = '';
-    companyInput.classList.remove('autofilled');
-    autofillBadge.innerHTML = '';
-  }
+  const kv = data.known_vehicle;
+  const companyInput = document.getElementById('f-company');
+  document.getElementById('known-badge').innerHTML = kv
+    ? '<span class="badge badge-known">✓ Known vehicle</span>'
+    : '<span class="badge badge-unknown">⚠ New vehicle</span>';
+  document.getElementById('autofill-badge').innerHTML = kv
+    ? '<span class="badge badge-autofill">auto-filled</span>' : '';
+  if (kv) { companyInput.value = kv.company_name || ''; companyInput.classList.add('autofilled'); }
+  else    { companyInput.value = ''; companyInput.classList.remove('autofilled'); }
 
   syncPlateField();
+  document.getElementById('plate-result-card').style.display = 'block';
+  document.getElementById('entry-form').style.display        = 'block';
+}
+
+// ── Render odometer ────────────────────────────────────────────────────────────
+function renderOdometer(data) {
+  document.getElementById('odo-reading').innerHTML = `${data.odometer}<span>km</span>`;
+  document.getElementById('odo-conf').textContent  =
+    `Detection confidence: ${Math.round(data.odometer_conf * 100)}%`;
+  document.getElementById('f-odometer').value      = data.odometer;
+  document.getElementById('odo-result').classList.add('show');
+  document.getElementById('odo-field').style.display = 'block';
+  // Make sure form is visible even if plate wasn't scanned yet
   document.getElementById('entry-form').style.display = 'block';
 }
 
-// ── Sync plate text field from inline dropdowns ────────────────────────────────
+// ── Sync plate field ───────────────────────────────────────────────────────────
 function syncPlateField() {
-  const row   = document.getElementById('plate-row');
-  let   plate = '';
+  const row = document.getElementById('plate-row');
+  let plate = '';
   Array.from(row.children).forEach(el => {
-    if (el.classList.contains('plate-char')) {
-      plate += el.textContent;
-    } else if (el.classList.contains('plate-select-wrap')) {
-      plate += el.querySelector('select').value;
-    }
+    if (el.classList.contains('plate-char'))         plate += el.textContent;
+    else if (el.classList.contains('plate-select-wrap')) plate += el.querySelector('select').value;
   });
   document.getElementById('f-plate').value = plate;
 }
 
-// ── Manual entry ───────────────────────────────────────────────────────────────
+// ── Manual plate entry ─────────────────────────────────────────────────────────
 function showManualForm() {
-  document.getElementById('btn-manual').style.display = 'none';
-  document.getElementById('plate-row').innerHTML      = '';
-  document.getElementById('plate-hint').textContent   = '';
-  document.getElementById('known-badge').innerHTML    = '';
-  document.getElementById('conf-fill').style.width    = '0%';
-  document.getElementById('conf-label').textContent   = '—';
-  document.getElementById('f-plate').value            = '';
-  hideBanner('error');
+  document.getElementById('btn-manual').style.display           = 'none';
+  document.getElementById('plate-row').innerHTML                = '';
+  document.getElementById('plate-hint').textContent             = '';
+  document.getElementById('known-badge').innerHTML              = '';
+  document.getElementById('conf-fill').style.width              = '0%';
+  document.getElementById('conf-label').textContent             = '—';
+  document.getElementById('f-plate').value                      = '';
+  document.getElementById('plate-result-card').style.display    = 'none';
+  hideBanner('plate-error');
   document.getElementById('entry-form').style.display = 'block';
   document.getElementById('f-plate').focus();
 }
@@ -560,40 +706,54 @@ function setLoad(val) {
 
 // ── Save entry ─────────────────────────────────────────────────────────────────
 async function saveEntry() {
-  const plate   = document.getElementById('f-plate').value.trim().toUpperCase();
-  const driver  = document.getElementById('f-driver').value.trim();
-  const company = document.getElementById('f-company').value.trim();
+  const plate    = document.getElementById('f-plate').value.trim().toUpperCase();
+  const driver   = document.getElementById('f-driver').value.trim();
+  const company  = document.getElementById('f-company').value.trim();
+  const odometer = document.getElementById('f-odometer').value.trim();
   if (!plate)   { document.getElementById('f-plate').focus();   return; }
   if (!driver)  { document.getElementById('f-driver').focus();  return; }
   if (!company) { document.getElementById('f-company').focus(); return; }
   document.getElementById('btn-save').disabled = true;
   try {
     const res  = await fetch('/save', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ plate_number:plate, driver_name:driver, company_name:company, load_status:state.load }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plate_number: plate, driver_name: driver,
+        company_name: company, load_status: state.load,
+        odometer_km:  odometer,
+      }),
     });
     const data = await res.json();
     if (data.success) {
       document.getElementById('banner-saved').classList.add('show');
       resetForm();
     } else {
-      showBanner('error', '⚠️ Save failed. Try again.');
+      showBanner('plate-error', '⚠️ Save failed. Try again.');
     }
-  } catch(e) { showBanner('error', '⚠️ Network error saving entry.'); }
+  } catch(e) { showBanner('plate-error', '⚠️ Network error saving entry.'); }
   document.getElementById('btn-save').disabled = false;
 }
 
 function resetForm() {
   setTimeout(() => {
-    document.getElementById('img-preview').style.display = 'none';
-    document.getElementById('entry-form').style.display  = 'none';
+    ['preview-plate','preview-odo'].forEach(id => {
+      const el = document.getElementById(id);
+      el.src = ''; el.classList.remove('show');
+    });
+    ['drop-plate','drop-odo'].forEach(id =>
+      document.getElementById(id).classList.remove('done','failed'));
+    document.getElementById('plate-result-card').style.display = 'none';
+    document.getElementById('entry-form').style.display        = 'none';
+    document.getElementById('odo-result').classList.remove('show');
+    document.getElementById('odo-field').style.display         = 'none';
     document.getElementById('banner-saved').classList.remove('show');
-    document.getElementById('plate-row').innerHTML = '';
-    document.getElementById('f-driver').value  = '';
-    document.getElementById('f-company').value = '';
-    document.getElementById('camera-input').value = '';
-    document.getElementById('file-input').value   = '';
+    document.getElementById('plate-row').innerHTML  = '';
+    document.getElementById('f-driver').value       = '';
+    document.getElementById('f-company').value      = '';
+    document.getElementById('f-odometer').value     = '';
     document.getElementById('btn-manual').style.display = 'none';
+    ['camera-plate','file-plate','camera-odo','file-odo'].forEach(id =>
+      document.getElementById(id).value = '');
     setLoad('Loaded');
   }, 2000);
 }
@@ -615,6 +775,7 @@ async function loadLogs(search='') {
           <span class="log-status ${log.load_status==='Loaded'?'status-loaded':'status-empty'}">${log.load_status||'—'}</span>
         </div>
         <div class="log-meta">${log.driver_name||'Unknown driver'} · ${log.company_name||'—'}</div>
+        ${log.odometer_km ? `<div class="log-odo">🔢 ${log.odometer_km} km</div>` : ''}
         <div class="log-meta">${formatTime(log.timestamp)}</div>
       </div>`).join('');
   } catch(e) { container.innerHTML = '<div class="empty-state">Could not load logs.</div>'; }
@@ -624,11 +785,8 @@ async function clearLogs() {
   if (!confirm("Delete all log entries? This cannot be undone.")) return;
   try {
     const res = await fetch('/logs', { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) loadLogs();
-  } catch(e) {
-    alert('Failed to clear logs.');
-  }
+    if ((await res.json()).success) loadLogs();
+  } catch(e) { alert('Failed to clear logs.'); }
 }
 
 function formatTime(ts) {
@@ -636,8 +794,14 @@ function formatTime(ts) {
   return new Date(ts).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
 }
 
-function showBanner(type, msg) { const el = document.getElementById('banner-'+type); el.textContent = msg; el.classList.add('show'); }
-function hideBanner(type) { document.getElementById('banner-'+type).classList.remove('show'); }
+function showBanner(type, msg) {
+  const el = document.getElementById('banner-'+type);
+  el.textContent = msg; el.classList.add('show');
+}
+function hideBanner(type) {
+  const el = document.getElementById('banner-'+type);
+  if (el) el.classList.remove('show');
+}
 </script>
 </body>
 </html>
